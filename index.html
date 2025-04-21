@@ -79,7 +79,8 @@
         });
 
         // Fallback: Fetch verse client-side if server-side fails
-        fetch('/get-verse')
+        // UPDATED FETCH URL
+        fetch('/api/get-verse')
             .then(response => response.json())
             .then(data => {
                 const verseDiv = document.getElementById('daily-verse');
