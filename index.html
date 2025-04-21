@@ -18,8 +18,8 @@
     </header>
     <main>
         <section class="hero">
-            <div id="daily-verse">
-                </div>
+            <!-- placeholder for server‑injected verse -->
+            <div id="daily-verse">{{VERSE_HERE}}</div>
             <a href="#Process" class="cta-button" id="how-to-link">How To?</a>
         </section>
         <section class="services">
@@ -71,6 +71,7 @@
         <p>Daily discoveries of God's direction</p>
         <p>© 2025 MAPS</p>
     </footer>
+
     <script>
         // Smooth scroll for "How To?" button
         document.getElementById('how-to-link').addEventListener('click', function(e) {
@@ -78,15 +79,12 @@
             document.getElementById('Process').scrollIntoView({ behavior: 'smooth' });
         });
 
-        // Fallback: Fetch verse client-side if server-side fails
-        // UPDATED FETCH URL
+        // Client‑side fetch fallback / progressive enhancement
         fetch('/api/get-verse')
             .then(response => response.json())
             .then(data => {
                 const verseDiv = document.getElementById('daily-verse');
-                if (verseDiv.innerHTML.includes('')) {
-                    verseDiv.innerHTML = `<h1>${data.citation}</h1><p>${data.text}</p>`;
-                }
+                verseDiv.innerHTML = `<h1>${data.citation}</h1><p>${data.text}</p>`;
             })
             .catch(error => {
                 console.error('Error fetching verse:', error);
@@ -97,7 +95,6 @@
         document.getElementById('share-button').addEventListener('click', function() {
             const servicesSection = document.querySelector('.services');
             html2canvas(servicesSection).then(canvas => {
-                // Convert canvas to a downloadable image
                 const link = document.createElement('a');
                 link.download = 'maps-service-screenshot.png';
                 link.href = canvas.toDataURL('image/png');
