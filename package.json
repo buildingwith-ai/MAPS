@@ -2,15 +2,15 @@
   "name": "maps-daily-verse",
   "version": "1.0.0",
   "description": "Daily verse updates for MAPS",
-  "main": "api/index.js",  // Changed main to point to the new server file location
+  "main": "api/index.js",
   "scripts": {
-    "start": "node api/index.js" // Updated start script as well
+    "start": "node api/index.js"
   },
   "dependencies": {
     "express": "^4.21.2"
   },
   "engines": {
-    "node": "^20.x"  // UPDATED Node.js version
+    "node": "^20.x"
   },
   "license": "MIT"
 }
