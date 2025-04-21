@@ -1,8 +1,7 @@
+// vercel.json
 {
   "rewrites": [
-    {
-      "source": "/",
-      "destination": "/api/index"
-    }
+    { "source": "/",            "destination": "/api/index"       },
+    { "source": "/api/get-verse","destination": "/api/index"       }
   ]
 }
