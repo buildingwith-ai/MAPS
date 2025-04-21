@@ -1,14 +1,31 @@
 const express = require('express');
 const fs = require('fs');
 const path = require('path');
+const helmet = require('helmet');
+const rateLimit = require('express-rate-limit');
+
 const app = express();
-// hide Express fingerprint
+
+// 🔐 SECURITY HEADERS
+app.use(helmet());
+
+// 🚦 RATE LIMITING
+const limiter = rateLimit({
+    windowMs: 15 * 60 * 1000, // 15 mins
+    max: 100, // max requests per IP
+    standardHeaders: true,
+    legacyHeaders: false,
+});
+app.use(limiter);
+
+// ❌ Hide Express fingerprint
 app.disable('x-powered-by');
 
+if (process.env.NODE_ENV !== 'production') {
+    console.log('🚀 Starting server...');
+}
 
-console.log('Starting server...');
-
-// Daily verses for April (dateLabel kept for reference but not displayed)
+// 📖 Daily verses for April
 const aprilVerses = {
     '2025-04-01': { dateLabel: 'April 1', citation: 'Ephesians 4:1', text: '"Therefore I, the prisoner in the Lord, urge you to walk worthy of the calling you have received."' },
     '2025-04-02': { dateLabel: 'April 2', citation: 'Ephesians 4:2', text: '"bearing with one another in love,"' },
@@ -42,65 +59,68 @@ const aprilVerses = {
     '2025-04-30': { dateLabel: 'April 30', citation: 'Ephesians 4:32', text: '"forgiving one another, just as God also forgave you in Christ."' }
 };
 
-// Function to get current date in CST
+// 🕰️ CST date handling
 function getCSTDate() {
     const now = new Date();
-    // Adjust for CDT (UTC-5, since April is in Daylight Saving Time)
-    const cstOffset = -5 * 60; // CDT is UTC-5
+    const cstOffset = -5 * 60; // CDT (UTC-5)
     const utc = now.getTime() + (now.getTimezoneOffset() * 60000);
-    const cstDate = new Date(utc + (cstOffset * 60000));
-    return cstDate;
+    return new Date(utc + (cstOffset * 60000));
 }
 
-// Function to get verse data based on date
+// 🎯 Get today’s verse
 function getVerseData() {
     const cstDate = getCSTDate();
     const currentHour = cstDate.getHours();
-    let dateKey;
 
-    console.log(`Current CST Date: ${cstDate.toISOString()}`);
-    console.log(`Current Hour: ${currentHour}`);
-
-    // Update at 2 AM CST: if before 2 AM, use previous day
-    if (currentHour < 2) {
-        cstDate.setDate(cstDate.getDate() - 1);
-        console.log(`Adjusted to previous day: ${cstDate.toISOString()}`);
+    if (process.env.NODE_ENV !== 'production') {
+        console.log(`Current CST: ${cstDate.toISOString()}`);
+        console.log(`Hour: ${currentHour}`);
     }
 
-    dateKey = cstDate.toISOString().split('T')[0];
-    console.log(`Date Key: ${dateKey}`);
+    if (currentHour < 2) {
+        cstDate.setDate(cstDate.getDate() - 1);
+        if (process.env.NODE_ENV !== 'production') {
+            console.log(`Adjusted to previous day: ${cstDate.toISOString()}`);
+        }
+    }
 
-    // Get verse for the current day, default to April 1 if not found
+    const dateKey = cstDate.toISOString().split('T')[0];
+
     const verseData = aprilVerses[dateKey] || aprilVerses['2025-04-01'];
-    console.log(`Selected Verse: ${verseData.dateLabel}: ${verseData.citation}`);
+
+    if (process.env.NODE_ENV !== 'production') {
+        console.log(`Verse selected: ${verseData.dateLabel} — ${verseData.citation}`);
+    }
 
     return verseData;
 }
 
-// Route to serve verse data as JSON (for client-side fallback)
+// 📡 JSON API route
 app.get('/api/get-verse', (req, res) => {
     const verseData = getVerseData();
     res.json(verseData);
 });
 
-// Route to serve the HTML with dynamic verse
+// 🖼️ HTML route
 app.get('/', (req, res) => {
     const verseData = getVerseData();
     const verseHtml = `<h1>${verseData.citation}</h1><p>${verseData.text}</p>`;
 
-    // Read the HTML file and replace the placeholder
     fs.readFile(path.join(__dirname, '..', 'index.html'), 'utf8', (err, data) => {
         if (err) {
-            console.error(`Error reading index.html: ${err}`);
+            console.error(`Error reading HTML: ${err}`);
             return res.status(500).send('Server error');
         }
+
         const updatedHtml = data.replace('{{VERSE_HERE}}', verseHtml);
+
         if (!updatedHtml.includes(verseHtml)) {
-            console.error('Placeholder not found or not replaced in index.html');
+            console.error('Placeholder not replaced in HTML');
         }
+
         res.send(updatedHtml);
     });
 });
 
-// Export the Express app (for Vercel)
+// ✅ Export for Vercel
 module.exports = app;
