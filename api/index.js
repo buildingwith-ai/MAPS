@@ -2,6 +2,9 @@ const express = require('express');
 const fs = require('fs');
 const path = require('path');
 const app = express();
+// hide Express fingerprint
+app.disable('x-powered-by');
+
 
 console.log('Starting server...');
 
