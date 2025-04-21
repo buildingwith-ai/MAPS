@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MAPS April</title>
+    <link rel="stylesheet" href="/style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+</head>
+<body>
+    <header>
+        <div class="logo">
+            <img src="/logo.png" alt="Play. Story. Eat. Logo" class="logo-image">
+        </div>
+        <nav>
+            <ul></ul>
+        </nav>
+    </header>
+    <main>
+        <section class="hero">
+            <div id="daily-verse">
+                </div>
+            <a href="#Process" class="cta-button" id="how-to-link">How To?</a>
+        </section>
+        <section class="services">
+            <h2></h2>
+            <div class="service">
+                <h3>Meaning/Paraphrase:</h3>
+                <textarea placeholder="Type your paraphrase here..."></textarea>
+            </div>
+            <div class="service">
+                <h3>Action: By God's grace I will...</h3>
+                <textarea placeholder="Type your action commitment here..."></textarea>
+            </div>
+            <div class="service">
+                <h3>Prayer: Jesus,</h3>
+                <textarea placeholder="Type your prayer here..."></textarea>
+            </div>
+            <div class="service">
+                <h3>Share the Story:</h3>
+                <textarea placeholder="Type your story here..."></textarea>
+                <button id="share-button" class="cta-button">Share</button>
+            </div>
+        </section>
+        <section class="Process" id="Process">
+            <h2>Process</h2>
+            <ul>
+                <li>Choose from God's Word a simple, direct command or a direction to follow or avoid. (That’s been done for you.)</li>
+                <li>What does it say? Repeat the command/direction to yourself until you know what it says.</li>
+                <li><strong>Meaning/Paraphrase:</strong> What does it mean? Write what the verse means in your own words, capturing its essence as you understand it. (Helpful Resource: Dictionary)</li>
+                <li><strong>Action:</strong> What am I going to do to respond? Commit to a specific, practical action informed by the verse and guided by the Spirit.
+                    <ul>
+                        <li>Specific</li>
+                        <li>Measurable</li>
+                        <li>Attainable</li>
+                        <li>Relevant</li>
+                        <li>Time bound</li>
+                    </ul>
+                </li>
+                <li><strong>Pray:</strong> Write out and pray a simple prayer reflecting on the verse, your personal context, and your action commitment.</li>
+                <li><strong>Share the Story:</strong> Tell somebody about your story about the verse, your paraphrase, and your action.</li>
+            </ul>
+        </section>
+        <section class="community">
+            <h2>Our Community</h2>
+            <p>Join others participating in the MAPS Process</p>
+            <a href="https://playstoryeat.com" class="cta-button">Join Now</a>
+        </section>
+    </main>
+    <footer>
+        <p>Daily discoveries of God's direction</p>
+        <p>© 2025 MAPS</p>
+    </footer>
+    <script>
+        // Smooth scroll for "How To?" button
+        document.getElementById('how-to-link').addEventListener('click', function(e) {
+            e.preventDefault();
+            document.getElementById('Process').scrollIntoView({ behavior: 'smooth' });
+        });
+
+        // Fallback: Fetch verse client-side if server-side fails
+        fetch('/get-verse')
+            .then(response => response.json())
+            .then(data => {
+                const verseDiv = document.getElementById('daily-verse');
+                if (verseDiv.innerHTML.includes('')) {
+                    verseDiv.innerHTML = `<h1>${data.citation}</h1><p>${data.text}</p>`;
+                }
+            })
+            .catch(error => {
+                console.error('Error fetching verse:', error);
+                document.getElementById('daily-verse').innerHTML = '<h1>Error</h1><p>Could not load verse. Please refresh the page.</p>';
+            });
+
+        // Share button to capture screenshot of .services section
+        document.getElementById('share-button').addEventListener('click', function() {
+            const servicesSection = document.querySelector('.services');
+            html2canvas(servicesSection).then(canvas => {
+                // Convert canvas to a downloadable image
+                const link = document.createElement('a');
+                link.download = 'maps-service-screenshot.png';
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+            }).catch(error => {
+                console.error('Error capturing screenshot:', error);
+                alert('Failed to capture screenshot. Please try again.');
+            });
+        });
+    </script>
+</body>
+</html>
