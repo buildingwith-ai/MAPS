@@ -18,7 +18,7 @@ const aprilVerses = {
     '2025-04-09': { dateLabel: 'April 9', citation: 'Ephesians 4:17', text: '"You should no longer walk as the Gentiles do, in the futility of their thoughts."' },
     '2025-04-10': { dateLabel: 'April 10', citation: 'Ephesians 4:19', text: '"They became callous and gave themselves over to promiscuity for the practice of every kind of impurity with a desire for more and more." "do not give in to promiscuity"' },
     '2025-04-11': { dateLabel: 'April 11', citation: 'Ephesians 4:20', text: '"But that is not how you came to know Christ," "know Christ"' },
-    '2025-04-12': { dateLabel: 'April 12', citation: 'Ephesians 4:21', text: '"assuming you heard about him and were taught by him, as the truth is in Jesus" "be taught by him"' },
+    '2025-04-12': { dateLabel: 'April 12', citation: 'Ephesians 4:21', text: '"assuming you heard about him and were taught by him, as the truth is in Jesus" "be taught by him"'},
     '2025-04-13': { dateLabel: 'April 13', citation: 'Ephesians 4:22', text: '"take off your former way of life, the old self that is corrupted by deceitful desires,"' },
     '2025-04-14': { dateLabel: 'April 14', citation: 'Ephesians 4:23', text: '"be renewed in the spirit of your minds,"' },
     '2025-04-15': { dateLabel: 'April 15', citation: 'Ephesians 4:24', text: '"put on the new self, the one created according to God’s likeness in righteousness and purity of the truth."' },
@@ -49,8 +49,9 @@ function getCSTDate() {
     return cstDate;
 }
 
-// Serve static files (CSS, images)
-app.use(express.static(path.join(__dirname)));
+// Serve static files (CSS, images) - NOTE: Vercel might serve these automatically from the root
+// This line might not be strictly necessary or could behave differently on Vercel
+// app.use(express.static(path.join(__dirname, '..'))); // Point to the directory above 'api'
 
 // Function to get verse data based on date
 function getVerseData() {
@@ -77,34 +78,45 @@ function getVerseData() {
     return verseData;
 }
 
-// Route to serve verse data as JSON (for client-side fallback)
-app.get('/get-verse', (req, res) => {
+// Route to serve verse data as JSON (for client-side fallback or direct access)
+// This will be accessible at /api/get-verse on Vercel
+app.get('/api/get-verse', (req, res) => {
     const verseData = getVerseData();
     res.json(verseData);
 });
 
+
 // Route to serve the HTML with dynamic verse
+// This needs to handle the root path '/' for the website
 app.get('/', (req, res) => {
     const verseData = getVerseData();
     const verseHtml = `<h1>${verseData.citation}</h1><p>${verseData.text}</p>`;
 
     // Read the HTML file and replace the placeholder
-    fs.readFile(path.join(__dirname, 'index.html'), 'utf8', (err, data) => {
+    // We need to go up one directory to find index.html
+    fs.readFile(path.join(__dirname, '..', 'index.html'), 'utf8', (err, data) => {
         if (err) {
             console.error(`Error reading index.html: ${err}`);
             res.status(500).send('Server error');
             return;
         }
-        const updatedHtml = data.replace('<!-- Server will insert verse here -->', verseHtml);
-        if (!updatedHtml.includes(verseHtml)) {
+        const updatedHtml = data.replace('', verseHtml);
+         if (!updatedHtml.includes(verseHtml)) {
             console.error('Placeholder not found or not replaced in index.html');
         }
         res.send(updatedHtml);
     });
 });
 
-// Start server
+// This is needed for Vercel to handle the serverless function
+// It exports the Express app instance
+module.exports = app;
+
+// The code below for starting the server is generally not needed for Vercel Serverless Functions
+// as Vercel handles the server process.
+/*
 const port = process.env.PORT || 3000;
 app.listen(port, () => {
     console.log(`Server running on port ${port}`);
 });
+*/
