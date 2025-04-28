@@ -64,7 +64,7 @@ const aprilVerses = {
 const mayVerses = {
     '2025-05-01': { dateLabel: 'May 1', citation: 'Ephesians 5:1', text: '"Therefore, be imitators of God, as dearly loved children,"' },
     '2025-05-02': { dateLabel: 'May 2', citation: 'Ephesians 5:2', text: '"walk in love, as Christ also loved us and gave himself for us,"' },
-    '2025-05-03': { dateLabel: 'May 3', citation: 'Ephesians 5:3', text: '"But sexual immorality and any impurity or greed not even be heard of among you, as is proper for saints."' },
+    '2025-05-03': { dateLabel: 'May 3', citation: 'Ephesians 5:3', text: '"But sexual immorality and any impurity or greed should not even be heard of among you, as is proper for saints."' },
     '2025-05-04': { dateLabel: 'May 4', citation: 'Ephesians 5:4', text: '"Obscene and foolish talking or crude joking are not suitable,"' },
     '2025-05-05': { dateLabel: 'May 5', citation: 'Ephesians 5:4', text: '"rather giving thanks."' },
     '2025-05-06': { dateLabel: 'May 6', citation: 'Ephesians 5:8', text: '"For you were once darkness, but now you are light in the Lord. Walk as children of light—"' },
